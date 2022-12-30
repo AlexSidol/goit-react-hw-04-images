@@ -2,12 +2,10 @@ import { useState } from 'react';
 import Modal from '../Modal/Modal';
 import css from './ImageGalleryItem.module.css';
 
-export default function ImageGalleryItem({ imageData }) {
+const ImageGalleryItem = ({ src, alt, largeImageURL }) => {
   const [isVisibleModal, setIsVisibleModal] = useState(false);
 
   const showModal = () => setIsVisibleModal(prev => !prev);
-
-  const { src, alt, largeImageURL } = imageData;
 
   return (
     <li className={css.imageGalleryItem}>
@@ -22,4 +20,6 @@ export default function ImageGalleryItem({ imageData }) {
       )}
     </li>
   );
-}
+};
+
+export default ImageGalleryItem;

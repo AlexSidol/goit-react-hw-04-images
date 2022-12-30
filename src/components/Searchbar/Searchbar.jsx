@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import css from './Searchbar.module.css';
 
-export default function Searchbar({ onSubmit }) {
+const Searchbar = ({ onSubmit }) => {
   const [searchInfo, setSearchInfo] = useState('');
 
   const handleSearchInfoChange = evt => {
@@ -13,12 +13,14 @@ export default function Searchbar({ onSubmit }) {
   const handleSearchInfoSubmit = evt => {
     evt.preventDefault();
 
-    if (searchInfo.trim() === '') {
+    const query = searchInfo.trim();
+
+    if (query === '') {
       toast.info('Enter your request...');
       return;
     }
-    onSubmit(searchInfo);
-    setSearchInfo('');
+
+    onSubmit(query);
   };
 
   return (
@@ -40,4 +42,6 @@ export default function Searchbar({ onSubmit }) {
       </form>
     </header>
   );
-}
+};
+
+export default Searchbar;

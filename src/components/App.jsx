@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import pixabayApi from '../services/pixabay-api';
 import ImageGallery from './ImageGallery/ImageGallery';
-
+import filteredArr from '../services/filteredArr';
 import Searchbar from '../components/Searchbar/Searchbar.jsx';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import css from '../components/App.module.css';
+import { useEffect } from 'react';
 
-export default function App() {
+const App = () => {
   const [status, setStatus] = useState('idle');
   const [requestInfo, setRequestInfo] = useState('');
   const [page, setPage] = useState(1);
@@ -21,22 +22,24 @@ export default function App() {
     if (!requestInfo) return;
 
     const renderImages = () => {
+      const perPage = 12;
       setStatus('pending');
 
       pixabayApi
         .fetchImages(requestInfo, page)
-        .then(({ images, totalPages }) => {
-          if (images.length === 0) {
+        .then(response => {
+          if (response.hits.length === 0) {
             toast.info(' No results for your request, try again ');
             setStatus('resolved');
             setShowButton(false);
             return;
           }
 
-          setImages(prev => [...prev, ...images]);
+          const normalizedData = filteredArr(response.hits);
+
+          setImages(prev => [...prev, ...normalizedData]);
           setStatus('resolved');
-          setPage(prev => prev + 1);
-          setShowButton(page < totalPages);
+          setShowButton(page < Math.ceil(response.totalHits / perPage));
         })
         .catch(() => {
           setStatus('rejected');
@@ -53,9 +56,10 @@ export default function App() {
 
   const handleFormSearch = newRequest => {
     if (newRequest === requestInfo) {
-      toast.info('Please, enter new request');
+      toast.info(' Same query ');
       return;
     }
+
     setRequestInfo(newRequest);
     setPage(1);
     setImages([]);
@@ -78,7 +82,10 @@ export default function App() {
       {status === 'resolved' && (
         <div>{showButton && <Button onClick={handleIncrement} />}</div>
       )}
+
       {status === 'pending' && <Loader />}
     </div>
   );
-}
+};
+
+export default App;
